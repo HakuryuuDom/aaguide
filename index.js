@@ -3,7 +3,7 @@
 const Command = require('command');
 const mapID = [9720, 9920];						// MAP ID to input [ Normal Mode , Hard Mode ]
 
-const ThirdBossActions = {						// Third Boss Attack Actions
+let ThirdBossActions = {						// Third Boss Attack Actions
 	113: {msg: 'Front, Back stun ↓', msg_ru: 'Передний, Задний ↓'},
 	111: {msg: 'Right Safe → , OUT safe', msg_ru: 'Право СЕЙФ → , Наружу СЕЙФ', sign_degrees: 90, sign_distance: 190},
 	109: {msg: '← Left Safe , IN safe', msg_ru: '← Лево СЕЙФ , Внутрь СЕЙФ', sign_degrees: 270, sign_distance: 110}
@@ -39,6 +39,12 @@ module.exports = function antaroth_guide(dispatch) {
 	}
 	
 	dispatch.hook('S_LOAD_TOPO', 1, (event) => {
+		if(dispatch.game.me.class === 'fighter' || dispatch.game.me.class === 'lancer') {
+			ThirdBossActions[111].msg = 'Right Safe → , OUT safe';
+			ThirdBossActions[109].msg = '← Left Safe , IN safe';
+			ThirdBossActions[111].msg_ru = 'Право СЕЙФ → , Наружу СЕЙФ';
+			ThirdBossActions[109].msg_ru = '← Лево СЕЙФ , Внутрь СЕЙФ'
+		}
 		if (event.zone === mapID[0]) 
 		{								
 			insidemap = true;
