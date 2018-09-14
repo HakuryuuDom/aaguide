@@ -40,10 +40,10 @@ module.exports = function antaroth_guide(dispatch) {
 	
 	dispatch.hook('S_LOAD_TOPO', 1, (event) => {
 		if(dispatch.game.me.class === 'fighter' || dispatch.game.me.class === 'lancer') {
-			ThirdBossActions[111].msg = 'Right Safe → , OUT safe';
-			ThirdBossActions[109].msg = '← Left Safe , IN safe';
-			ThirdBossActions[111].msg_ru = 'Право СЕЙФ → , Наружу СЕЙФ';
-			ThirdBossActions[109].msg_ru = '← Лево СЕЙФ , Внутрь СЕЙФ'
+			ThirdBossActions[111].msg = '← Left Safe , OUT safe';
+			ThirdBossActions[109].msg = 'Right Safe → , IN safe';
+			ThirdBossActions[111].msg_ru = '← Лево СЕЙФ , Наружу СЕЙФ';
+			ThirdBossActions[109].msg_ru = 'Право СЕЙФ → , Внутрь СЕЙФ';
 		}
 		if (event.zone === mapID[0]) 
 		{								
