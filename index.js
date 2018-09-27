@@ -1,112 +1,138 @@
 /* Usable Sysbols ◎●←↑→↓↖↗↘↙ */
 
 const Command = require('command');
-const mapID = [9720, 9920];						// MAP ID to input [ Normal Mode , Hard Mode ]
+const mapID = [9720, 9920];					// MAP ID to input [ Normal Mode , Hard Mode ]
 
-let ThirdBossActions = {						// Third Boss Attack Actions
-	113: {msg: 'Front, Back stun ↓', msg_ru: 'Передний, Задний ↓'},
-	111: {msg: 'Right Safe → , OUT safe', msg_ru: 'Право СЕЙФ → , Наружу СЕЙФ', sign_degrees: 90, sign_distance: 190},
-	109: {msg: '← Left Safe , IN safe', msg_ru: '← Лево СЕЙФ , Внутрь СЕЙФ', sign_degrees: 270, sign_distance: 110}
-};
-
-const ThirdBossTwoUp = {
-	104: {msg: 'Back stun ↓', msg_ru: 'Задний ↓'}
+// BossAction[HuntingZoneId][TempalateId][Skill]
+const BossActions = {
+    // Normal Mode
+    720: {
+        // First Boss
+        1000: {
+            1116: {msg: 'Out ↓ In ↑'},
+            2116: {msg: 'Out ↓ In ↑'}, // rage
+            1117: {msg: 'In ↑ Out ↓'},
+            2117: {msg: 'In ↑ Out ↓'}, // rage
+            1300: {msg: 'Delete soon', deletionTimer: true}, // 'Your flesh will be deleted!'
+        },
+        // Second Boss NM
+        2000: {
+            // Second Boss NM
+            1106: {msg: 'Spin ↓'},
+            2106: {msg: 'Spin ↓'}, // rage
+            3119: {msg: 'Red, Out safe ↓'},
+            3220: {msg: 'Blue, In safe ↑'},   
+        },
+        // Third Boss NM
+        3000: {
+            // Third Boss NM
+            1113: {msg: 'Front, Back stun ↓'},
+            2113: {msg: 'Front, Back stun ↓'}, // rage
+            1111: {msg: '→ Right Safe →', msgForTanks: '← Left Safe ←'},
+            2111: {msg: '→ Right Safe →', msgForTanks: '← Left Safe ←'}, // rage
+            1109: {msg: '← Left Safe ←',  msgForTanks: '→ Right Safe →'},
+            2109: {msg: '← Left Safe ←',  msgForTanks: '→ Right Safe →'}, // rage
+            1104: {msg: 'Back stun ↓', checkTwoUp: true},
+            2104: {msg: 'Back stun ↓', checkTwoUp: true}, // rage            
+        }
+    },
+    // Hard Mode
+    920: {
+        // First Boss HM
+        1000: {
+            1130: {msg: 'In ↑ Out ↓'}, // (big aoe)
+            2130: {msg: 'Out ↓ In ↑'}, // (big aoe) rage
+            1116: {msg: 'Out ↓ In ↑'},
+            2116: {msg: 'Out ↓ In ↑'}, // rage
+            1117: {msg: 'In ↑ Out ↓'},
+            2117: {msg: 'In ↑ Out ↓'}, // rage
+            1300: {msg: 'Delete soon', deletionTimer: true},
+        },
+        // Second Boss HM
+        2000: {
+            1106: {msg: 'Spin ↓'},
+            2106: {msg: 'Spin ↓'}, // rage
+            3119: {msg: 'Red, Out safe ↓'},
+            3220: {msg: 'Blue, In safe ↑'},    
+        },
+        // Third Boss HM
+        3000: {
+            1113: {msg: 'Front, back stun ↓'},
+            2113: {msg: 'Front, back stun ↓'}, // rage
+            1111: {msg: '→ Right Safe, OUT safe', msgForTanks: '← Left Safe, OUT safe'},
+            2111: {msg: '→ Right Safe, OUT safe', msgForTanks: '← Left Safe, OUT safe'}, // rage
+            1109: {msg: '← Left Safe, IN safe',   msgForTanks: '→ Right Safe, IN safe'},
+            2109: {msg: '← Left Safe, IN safe',   msgForTanks: '→ Right Safe, IN safe'}, // rage
+            1104: {msg: 'Back stun ↓', checkTwoUp: true}, // HM
+            2104: {msg: 'Back stun ↓', checkTwoUp: true} // HM Rage
+        }
+    }
 };
 
 module.exports = function antaroth_guide(dispatch) {
 	const command = Command(dispatch);
 	let hooks = [],
-		bossCurLocation,
-		bossCurAngle,
-		uid = 999999999,
-		uid2 = 899999999;
-		sendToParty = false,
-		enabled = true,
-		itemhelper = true,
-		insidemap = false,
-	   	streamenabled = false;
-		
-	if(dispatch.base.region == "ru")
-	{
-		for (let prop in ThirdBossActions)
-		{
-			ThirdBossActions[prop].msg = ThirdBossActions[prop].msg_ru;
-		}
-		for (let prop in ThirdBossTwoUp)
-		{
-			ThirdBossTwoUp[prop].msg = ThirdBossTwoUp[prop].msg_ru;
-		}
-	}
-	
-	dispatch.hook('S_LOAD_TOPO', 1, (event) => {
-		if(dispatch.game.me.class === 'fighter' || dispatch.game.me.class === 'lancer') { //bad code tbh
-			ThirdBossActions[111].msg = '← Left Safe , OUT safe';
-			ThirdBossActions[109].msg = 'Right Safe → , IN safe';
-			ThirdBossActions[111].msg_ru = '← Лево СЕЙФ , Наружу СЕЙФ';
-			ThirdBossActions[109].msg_ru = 'Право СЕЙФ → , Внутрь СЕЙФ';
-		} else {
-			ThirdBossActions[111].msg = 'Right Safe → , OUT safe';
-			ThirdBossActions[109].msg = '← Left Safe , IN safe';
-			ThirdBossActions[111].msg_ru = 'Право СЕЙФ → , Наружу СЕЙФ';
-			ThirdBossActions[109].msg_ru = '← Лево СЕЙФ , Внутрь СЕЙФ';
-		}
-		if (event.zone === mapID[0]) 
-		{								
-			insidemap = true;
-			command.message('Welcome to Antaroth - Normal Mode');
-			load();
-		} 
-		else if (event.zone === mapID[1]) {
-			insidemap = true;
-			command.message('Welcome to Antaroth - Hard Mode');
-			load();
-		} 
-		else
-		{
-			insidemap = false;
-			unload();
-		}
+        enabled = true,
+        insidemap = false,
+        streamenabled = false,
+        isTank = false,
+        bossInfo = undefined;
+
+    dispatch.hook('S_LOGIN', 10, (event) => {
+        let job = (event.templateId - 10101) % 100;
+        isTank = (job === 1 || job === 10) ? true : false;
+    });
+
+    dispatch.hook('S_LOAD_TOPO', 3, (event) => {
+        if (event.zone === mapID[0]) 
+        {								
+            if (!insidemap) command.message('Welcome to Antaroth - Normal Mode');
+            insidemap = true;
+            load();
+        } 
+        else if (event.zone === mapID[1]) {
+            if (!insidemap) command.message('Welcome to Antaroth - Hard Mode');
+            insidemap = true;
+            load();
+        } 
+        else
+        {
+            insidemap = false;
+            unload();
+        }
     });
 	
-	command.add('aaguide', () => {
-		if(!insidemap) { command.message('You must be inside Antaroth'); return; }
-		enabled = !enabled;
-		command.message('Antaroth Guide '+(enabled ? 'Enabled' : 'Disabled') + '.');
-	});
-	
-	command.add('itemhelp', () => {
-		if(!insidemap) { command.message('You must be inside Antaroth'); return; }
-		itemhelper = !itemhelper;
-		command.message('Signs on safe spots '+(itemhelper ? 'Enabled' : 'Disabled') + '.');
-	});
-	
-	command.add('toparty', (arg) => {
-		if(!insidemap) { command.message('You must be inside Antaroth'); return; }
-		if(arg === "stream")
-		{
-			streamenabled = !streamenabled;
-			sendToParty = false;
-			itemhelper = false;
-			command.message((streamenabled ? 'Stream mode Enabled' : 'Stream mode Disabled'));
-		}
-		else
-		{
-			streamenabled = false;
-			sendToParty = !sendToParty;
-			command.message((sendToParty ? 'Antaroth Guide - Messages will be sent to the party' : 'Antaroth Guide - Only you will see messages in chat'));
-		}
-	});
+    command.add('aaguide', (arg) => {
+        if (arg === undefined) {
+            //if(!insidemap) { command.message('You must be inside Antaroth'); return; }
+            enabled = !enabled;
+            command.message((enabled ? 'Enabled' : 'Disabled') + '.');
+        }
+        else if(arg.toLowerCase() === "off")
+        {
+            enabled = false;
+            command.message((enabled ? 'Enabled' : 'Disabled') + '.');
+        }
+        else if(arg.toLowerCase() === "on")
+        {
+            enabled = true;
+            command.message((enabled ? 'Enabled' : 'Disabled') + '.');
+        }
+        else if(arg.toLowerCase() === "stream")
+        {
+            streamenabled = !streamenabled;
+            command.message((streamenabled ? 'Stream mode Enabled' : 'Stream mode Disabled'));
+        }
+        else if(arg.toLowerCase() === "tank")
+        {
+            isTank = !isTank;
+            command.message('Tank Mode '+(isTank ? 'Enabled' : 'Disabled') + '.');
+        }
+    });
 	
 	function sendMessage(msg)
 	{
-		if (sendToParty) 
-		{
-			dispatch.toServer('C_CHAT', 1, {
-			channel: 21, //21 = p-notice, 1 = party, 2 = guild
-			message: msg
-			});
-		}
-		else if(streamenabled) 
+		if(streamenabled) 
 		{
 			command.message(msg);
 		}
@@ -120,96 +146,51 @@ module.exports = function antaroth_guide(dispatch) {
 		}
 	}
 	
-	function SpawnThing(degrees, radius)
-	{
-		let r = null, rads = null, finalrad = null, pos = null;
-		r = bossCurAngle - Math.PI;
-		rads = (degrees * Math.PI/180);
-		finalrad = r - rads;
-		bossCurLocation.x = bossCurLocation.x + radius * Math.cos(finalrad);
-		bossCurLocation.y = bossCurLocation.y + radius * Math.sin(finalrad);
-		
-		dispatch.toClient('S_SPAWN_BUILD_OBJECT', 2, {
-			gameId : uid,
-			itemId : 1,
-			loc : bossCurLocation,
-			w : r,
-			unk : 0,
-			ownerName : 'SAFE SPOT',
-			message : 'SAFE'
-		});
-		
-		setTimeout(DespawnThing, 5000, uid, uid2);
-		uid--;
-		bossCurLocation.z = bossCurLocation.z - 100;
-		dispatch.toClient('S_SPAWN_DROPITEM', 6, {
-			gameId: uid2,
-			loc: bossCurLocation,
-			item: 98260,
-			amount: 1,
-			expiry: 6000,
-			owners: [{playerId: uid2}]
-		});
-		uid2++;
-	}
-	
-	function DespawnThing(uid_arg, uid_arg2)
-	{
-		dispatch.toClient('S_DESPAWN_BUILD_OBJECT', 2, {
-				gameId : uid_arg,
-				unk : 0
-			});
-		dispatch.toClient('S_DESPAWN_DROPITEM', 4, {
-				gameId: uid_arg2
-			});
-	}
-	
-	let lasttwoup = 0, rotationdelaylast = 0, rotationdelay = 0, bossid = 0;
-	function load()
-	{
-		if(!hooks.length)
-		{
-			hook('S_CREATURE_ROTATE', 2, (event) => {
-				if(!lasttwoup || !bossid.equals(event.gameId)) return;
-				rotationdelaylast = Date.now();
-				rotationdelay = event.time;
-			});
-			
-			hook('S_ACTION_STAGE', dispatch.majorPatchVersion >= 75 ? 8 : (dispatch.majorPatchVersion >= 74 ? 7 : 6), (event) => {
-				if(!enabled || event.templateId !== 3000) return;
-				
-				if (ThirdBossTwoUp[event.skill.id % 1000])
-				{
-					let now = Date.now();
-					if(now - rotationdelaylast > 1200) // ~890
-					{
-						rotationdelay = 0;
-					}
-					if(now - lasttwoup - rotationdelay < 2900) // ~2100-2600, fake calls are at 2900+ (followed by a 3rd two-up and a stun)
-					{
-						sendMessage(ThirdBossTwoUp[event.skill.id % 1000].msg /*+ " : " + String(now - lasttwoup) + " - " + String(rotationdelay) + " = " + String(now - lasttwoup - rotationdelay)*/ );
-					}
-					lasttwoup = now;
-					bossid = event.gameId;
-				}
-				else
-				{
-					lasttwoup = 0;
-					rotationdelaylast = 0;
-					if (ThirdBossActions[event.skill.id % 1000])
-					{
-						sendMessage(ThirdBossActions[event.skill.id % 1000].msg);
-						if(itemhelper && typeof ThirdBossActions[event.skill.id % 1000].sign_degrees !== "undefined")
-						{
-							bossCurLocation = event.loc;
-							bossCurAngle = event.w;
-							SpawnThing(ThirdBossActions[event.skill.id % 1000].sign_degrees, ThirdBossActions[event.skill.id % 1000].sign_distance)
-						}
-					}
-				}
-			});
-		}
-	}
+    let lasttwoup = 0;
+    function load()
+    {
+        if(!hooks.length)
+        {
+            hook('S_BOSS_GAGE_INFO', 3, (event) => {
+                bossInfo = event;
+            });
+            
+            hook('S_ACTION_STAGE', 7, (event) => {              
+                if (!enabled) return;                
+                if (!bossInfo) return;
+                if (!event.gameId.equals(bossInfo.id)) return;
+                if (!BossActions[bossInfo.huntingZoneId] || !BossActions[bossInfo.huntingZoneId][bossInfo.templateId]) return;
+                
+                let bossAction = BossActions[bossInfo.huntingZoneId][bossInfo.templateId][event.skill.id];
+                if (bossAction) 
+                {
+                    if (bossAction.deletionTimer) 
+                    {
+                        /*Bug: Deletes start happening at 80%, the first notification will not be sent. To fix, need to check boss HP*/
+                        /*Bug: A message gets sent one time after boss dies. To fix, need to clear timer when boss dies or when party wipes.*/
+                        setTimeout(()=>{sendMessage(bossAction.msg)}, 60000); // usually happens ~70000
+                    }
+                    else if (bossAction.checkTwoUp) 
+                    {
+                        let now = Date.now();
+                        if((now - lasttwoup) < 3000) // usually <2350
+                        {
+                            sendMessage(bossAction.msg);
+                        }
+                        lasttwoup = now;
+                    }
+                    else if (isTank && bossAction.msgForTanks) 
+                    {
+                        sendMessage(bossAction.msgForTanks);
+                    }
+                    else
+                    {
+                        sendMessage(bossAction.msg);
+                    }
+                }
+            });
+        }
+    }
 	
 	function unload() {
 		if(hooks.length) {
@@ -222,4 +203,5 @@ module.exports = function antaroth_guide(dispatch) {
 	function hook() {
 		hooks.push(dispatch.hook(...arguments))
 	}
+    
 }

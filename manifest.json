@@ -1,17 +1,19 @@
 {
 	"files": {
-		"README.md": "80cd28b7127a301a69cd65e66101db792aecdce33884dfe56160e5ea4a842960",
-		"index.js": "57add8c4c06aa748719e08b8333961527329c94a4f8dd8d6e6d344e4e3cf0c7b",
-		"module.json": "fadd720e4f8a252401f176193c49e4da2123313940db8fcb3a7f564ef8961f4a"
+		"README.md": "c4216e4c11f1fd05cb7934dc1ee28e8677fda7393ef927edb8b874044168890c",
+		"index.js": "d71bff8f12c8fea0b4142c861cb53abeb4e80da811c3b5c5cbcb28bd19427b3b",
+		"module.json": "b8a5703a1e069bf1537a62a17b88e32304a73db639a35b0f49894654c3482864"
 	},
 	"defs": {
 		"C_CHAT": 1,
 		"S_ACTION_STAGE": [6,7,8],
+		"S_BOSS_GAGE_INFO": 3,
 		"S_CHAT": 1,
 		"S_CREATURE_ROTATE": 2,
 		"S_DESPAWN_BUILD_OBJECT": 2,
 		"S_DESPAWN_DROPITEM": 4,
-		"S_LOAD_TOPO": 1,
+		"S_LOAD_TOPO": [1,3],
+		"S_LOGIN": 10,
 		"S_SPAWN_BUILD_OBJECT": 2,
 		"S_SPAWN_DROPITEM": 6
 	}

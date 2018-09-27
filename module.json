@@ -1,5 +1,4 @@
 {
 	"disableAutoUpdate": false,
-	"servers": ["https://raw.githubusercontent.com/HakuryuuDom/aaguide/master/"],
-	"supportUrl": "https://github.com/Owyn/aaguide/issues"
+	"servers": ["https://raw.githubusercontent.com/HakuryuuDom/aaguide/master/"]
 }
