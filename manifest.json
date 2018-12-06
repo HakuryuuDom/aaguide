@@ -5,16 +5,10 @@
 		"module.json": "b8a5703a1e069bf1537a62a17b88e32304a73db639a35b0f49894654c3482864"
 	},
 	"defs": {
-		"C_CHAT": 1,
-		"S_ACTION_STAGE": [6,7,8],
+		"S_ACTION_STAGE": 7,
 		"S_BOSS_GAGE_INFO": 3,
 		"S_CHAT": 1,
-		"S_CREATURE_ROTATE": 2,
-		"S_DESPAWN_BUILD_OBJECT": 2,
-		"S_DESPAWN_DROPITEM": 4,
-		"S_LOAD_TOPO": [1,3],
-		"S_LOGIN": 10,
-		"S_SPAWN_BUILD_OBJECT": 2,
-		"S_SPAWN_DROPITEM": 6
+		"S_LOAD_TOPO": 3,
+		"S_LOGIN": 10
 	}
 }
