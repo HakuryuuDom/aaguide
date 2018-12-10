@@ -1,6 +1,5 @@
 /* Usable Sysbols ◎●←↑→↓↖↗↘↙ */
 
-const Command = require('command');
 const mapID = [9720, 9920];					// MAP ID to input [ Normal Mode , Hard Mode ]
 
 // BossAction[HuntingZoneId][TempalateId][Skill]
@@ -70,7 +69,7 @@ const BossActions = {
 };
 
 module.exports = function antaroth_guide(dispatch) {
-	const command = Command(dispatch);
+	const command = dispatch.command;
 	let hooks = [],
         enabled = true,
         insidemap = false,
