@@ -1,4 +1,11 @@
 {
 	"disableAutoUpdate": false,
+	"name": "AA-Guide",
+	"author": "Owyn / teralove / (forked by HakuryuuDom)",
+	"description": "Guide module for Antaroth's Abyss.",
+	"version": "1.0",
+	"options": {
+		"niceName": "AA-Guide"
+	},
 	"servers": ["https://raw.githubusercontent.com/HakuryuuDom/aaguide/master/"]
 }
